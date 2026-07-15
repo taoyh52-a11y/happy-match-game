@@ -4275,9 +4275,9 @@
         return fresh;
       }
 
-      async function resolveBoard(round) {
+      async function resolveBoard(round, initialMatches = null) {
         let chain = 1;
-        let matches = findMatches(state.board);
+        let matches = initialMatches ? new Set(initialMatches) : findMatches(state.board);
         while (matches.size > 0) {
           const cleared = await clearMatches(matches, chain, round);
           if (!cleared || round !== state.round) return false;
@@ -4297,15 +4297,34 @@
         if (state.busy || state.ended || state.paused || !isAdjacent(a, b)) return;
         clearHint();
         const round = state.round;
+        const typeAtA = state.board[a.row][a.col];
+        const typeAtB = state.board[b.row][b.col];
+        const specialAtA = state.specials[a.row][a.col];
+        const specialAtB = state.specials[b.row][b.col];
         setBoardBusy(true);
         state.selected = null;
         await animateSwap(a, b);
         if (round !== state.round) return;
         swap(state.board, a, b);
         swap(state.specials, a, b);
+        const rainbowAtA = specialAtB === "rainbow";
+        const rainbowAtB = specialAtA === "rainbow";
+        let matches = findMatches(state.board);
+        if (rainbowAtA && rainbowAtB) {
+          matches = new Set(Array.from({ length: SIZE * SIZE }, (_, index) => (
+            positionKey(Math.floor(index / SIZE), index % SIZE)
+          )));
+          setActivity("双彩虹核心共鸣，清空棋盘！");
+        } else if (rainbowAtA || rainbowAtB) {
+          const rainbowPosition = rainbowAtA ? a : b;
+          const targetType = rainbowAtA ? typeAtA : typeAtB;
+          state.board[rainbowPosition.row][rainbowPosition.col] = targetType;
+          matches.add(positionKey(rainbowPosition.row, rainbowPosition.col));
+          setActivity(`彩虹核心锁定${TYPE_NAMES[targetType]}！`);
+        }
         renderBoard();
 
-        if (findMatches(state.board).size === 0) {
+        if (matches.size === 0) {
           boardElement.classList.add("invalid");
           setActivity("这一步没有形成连消");
           playTone("error");
@@ -4324,7 +4343,7 @@
 
         state.moves -= 1;
         renderStats();
-        const resolved = await resolveBoard(round);
+        const resolved = await resolveBoard(round, matches);
         if (!resolved || round !== state.round) return;
 
         if (state.score >= TARGET_SCORE && state.bossDefeated) {
