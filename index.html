@@ -501,6 +501,52 @@
       opacity: 0.55;
     }
 
+    .boss-hud {
+      position: absolute;
+      z-index: 10;
+      top: 34px;
+      left: 50%;
+      width: min(62%, 285px);
+      display: grid;
+      grid-template-columns: auto minmax(54px, 1fr) auto;
+      align-items: center;
+      gap: 6px;
+      padding: 3px 7px;
+      border: 2px solid var(--ink);
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.94);
+      box-shadow: 2px 2px 0 var(--ink);
+      font-size: 9px;
+      font-weight: 900;
+      transform: translateX(-50%);
+    }
+
+    .boss-hud[hidden] { display: none; }
+
+    .boss-hud > span {
+      color: var(--coral);
+      white-space: nowrap;
+    }
+
+    .boss-health-track {
+      height: 8px;
+      border: 1px solid var(--ink);
+      background: #e8e0d5;
+      overflow: hidden;
+    }
+
+    .boss-health-fill {
+      display: block;
+      width: 100%;
+      height: 100%;
+      background: var(--coral);
+      transition: width 180ms ease, background 180ms ease;
+    }
+
+    .battle-lane.boss-raging .boss-health-fill { background: #d53939; }
+    .battle-lane.boss-critical .boss-health-fill { background: #8b1e2d; }
+    .battle-lane.has-boss .attack-banner { top: 59px; }
+
     .attack-banner {
       position: absolute;
       z-index: 9;
@@ -541,6 +587,12 @@
       white-space: nowrap;
       transform: translate(-50%, -50%);
       animation: waveCallout 1100ms ease-out forwards;
+    }
+
+    .wave-callout.boss-callout {
+      background: var(--coral);
+      color: white;
+      text-shadow: 0 2px 0 rgba(23, 32, 51, 0.35);
     }
 
     .castle-wall {
@@ -630,11 +682,53 @@
 
     .monster {
       position: absolute;
-      bottom: 7px;
+      bottom: calc(7px + var(--lane-offset, 0px));
       width: 48px;
       height: 88px;
       transform: translateX(-50%);
       transition: left 110ms linear;
+    }
+
+    .monster.boss {
+      width: 78px;
+      height: 119px;
+      z-index: 5;
+    }
+
+    .monster.boss .zombie-figure {
+      left: 14px;
+      bottom: 0;
+      --zombie-scale: 1.32;
+      transform-origin: bottom center;
+    }
+
+    .monster.boss .monster-health {
+      top: -2px;
+      left: 5px;
+      width: 68px;
+      height: 8px;
+    }
+
+    .monster.boss .monster-shield {
+      top: 7px;
+      left: 5px;
+      width: 67px;
+      height: 99px;
+    }
+
+    .boss-mark {
+      position: absolute;
+      z-index: 8;
+      top: -19px;
+      left: 50%;
+      padding: 1px 5px;
+      border: 2px solid var(--ink);
+      background: var(--yellow);
+      color: var(--ink);
+      font-size: 8px;
+      font-style: normal;
+      font-weight: 900;
+      transform: translateX(-50%);
     }
 
     .zombie-figure {
@@ -829,6 +923,51 @@
       background: linear-gradient(#6a5143 0 42%, #8c896f 43% 100%);
     }
 
+    .monster.variant-3 .zombie-head {
+      background: #65755e;
+      box-shadow: inset 7px 0 rgba(255, 255, 255, 0.08);
+    }
+
+    .monster.variant-3 .zombie-head::before {
+      top: -8px;
+      left: -5px;
+      width: 33px;
+      height: 13px;
+      border-bottom: 2px solid var(--ink);
+      border-radius: 45% 45% 12% 12%;
+      background: #32383c;
+      clip-path: polygon(0 32%, 22% 5%, 48% 27%, 76% 0, 100% 24%, 94% 100%, 5% 100%);
+    }
+
+    .monster.variant-3 .zombie-torso,
+    .monster.variant-3 .zombie-arm {
+      background-color: #3f3942;
+    }
+
+    .monster.variant-3 .zombie-arm {
+      background: linear-gradient(#3f3942 0 42%, #65755e 43% 100%);
+    }
+
+    .monster.boss-phase-1 .zombie-eye {
+      background: #ffb33e;
+      box-shadow: 0 0 6px #ff963c;
+    }
+
+    .monster.boss-phase-2 .zombie-eye {
+      background: #ff4f4f;
+      box-shadow: 0 0 8px #ec5d48;
+    }
+
+    .monster.boss-phase-2 .zombie-figure {
+      animation-duration: 360ms;
+      filter: drop-shadow(0 0 8px rgba(236, 93, 72, 0.88));
+    }
+
+    .monster.boss .status-aura {
+      transform: scale(1.24);
+      transform-origin: bottom center;
+    }
+
     .monster-health {
       position: absolute;
       z-index: 2;
@@ -983,6 +1122,11 @@
       height: 82px;
       transform: translateX(-50%);
       pointer-events: none;
+    }
+
+    .death-effect.boss-death {
+      transform: translateX(-50%) scale(1.32);
+      filter: drop-shadow(0 0 10px var(--yellow));
     }
 
     .death-effect .death-zombie {
@@ -2506,7 +2650,7 @@
       }
 
       .monster {
-        bottom: 5px;
+        bottom: calc(5px + var(--lane-offset, 0px));
         width: 42px;
         height: 82px;
       }
@@ -2519,6 +2663,27 @@
 
       .monster-health {
         width: 39px;
+      }
+
+      .monster.boss {
+        width: 67px;
+        height: 110px;
+      }
+
+      .monster.boss .zombie-figure {
+        left: 10px;
+        --zombie-scale: 1.2;
+      }
+
+      .monster.boss .monster-health {
+        width: 59px;
+      }
+
+      .boss-hud {
+        top: 33px;
+        width: 58%;
+        gap: 4px;
+        padding-inline: 5px;
       }
 
       .battle-road {
@@ -2795,6 +2960,11 @@
             <span class="wall-health-track" aria-hidden="true"><i class="wall-health-fill" id="wallHpFill"></i></span>
           </div>
           <div class="wave-badge"><span>第<strong id="waveValue">1</strong>波</span><i>·</i><span>击退 <strong id="defeatedValue">0</strong></span></div>
+          <div class="boss-hud" id="bossHud" hidden>
+            <span>首领</span>
+            <i class="boss-health-track" aria-hidden="true"><b class="boss-health-fill" id="bossHpFill"></b></i>
+            <strong id="bossHpValue">0/0</strong>
+          </div>
           <div class="attack-banner" id="attackBanner" aria-live="polite"></div>
           <div class="castle-wall" aria-hidden="true"><i class="wall-power-core" id="wallPowerCore"></i></div>
           <div class="monster-layer" id="monsterLayer" aria-live="off"></div>
@@ -2907,7 +3077,8 @@
       const ENEMY_TYPES = [
         { name: "普通僵尸", hp: 5, speed: 0.031, damage: 15, variant: 0, shield: 0 },
         { name: "迅捷僵尸", hp: 4, speed: 0.046, damage: 12, variant: 2, shield: 0 },
-        { name: "护甲僵尸", hp: 7, speed: 0.024, damage: 21, variant: 1, shield: 3 }
+        { name: "护甲僵尸", hp: 7, speed: 0.024, damage: 21, variant: 1, shield: 3 },
+        { name: "裂城巨尸", hp: 28, speed: 0.014, damage: 42, variant: 3, shield: 6, boss: true }
       ];
       const ZOMBIE_MARKUP = '<i class="zombie-arm left"></i><i class="zombie-arm right"></i><i class="zombie-leg left"></i><i class="zombie-leg right"></i><i class="zombie-torso"></i><i class="zombie-head"><b class="zombie-eye left"></b><b class="zombie-eye right"></b><b class="zombie-jaw"></b></i>';
       const NUMBER = new Intl.NumberFormat("zh-CN");
@@ -2928,6 +3099,9 @@
       const defeatedValue = document.getElementById("defeatedValue");
       const waveValue = document.getElementById("waveValue");
       const sidebarWaveValue = document.getElementById("sidebarWaveValue");
+      const bossHud = document.getElementById("bossHud");
+      const bossHpFill = document.getElementById("bossHpFill");
+      const bossHpValue = document.getElementById("bossHpValue");
       const defenseChargeValue = document.getElementById("defenseChargeValue");
       const threatValue = document.getElementById("threatValue");
       const attackBanner = document.getElementById("attackBanner");
@@ -2977,6 +3151,8 @@
         barrageActive: false,
         defeated: 0,
         wave: 0,
+        bossSpawned: false,
+        bossDefeated: false,
         feedbackId: 0,
         hintTimer: null,
         hintCells: [],
@@ -3274,12 +3450,16 @@
         return 2;
       }
 
-      function showWaveCallout() {
+      function showLaneCallout(message, className = "") {
         const callout = document.createElement("strong");
-        callout.className = "wave-callout";
-        callout.textContent = state.wave === WAVES.length - 1 ? "最终波" : `第 ${state.wave + 1} 波`;
+        callout.className = `wave-callout${className ? ` ${className}` : ""}`;
+        callout.textContent = message;
         battleEffects.appendChild(callout);
         callout.addEventListener("animationend", () => callout.remove(), { once: true });
+      }
+
+      function showWaveCallout() {
+        showLaneCallout(state.wave === WAVES.length - 1 ? "最终波" : `第 ${state.wave + 1} 波`);
       }
 
       function updateWave() {
@@ -3291,6 +3471,7 @@
         setActivity(state.wave === WAVES.length - 1 ? "最终波来袭！" : `第 ${state.wave + 1} 波来袭！`);
         playTone("chain");
         renderBattle();
+        if (state.wave === WAVES.length - 1 && !state.bossSpawned) spawnBoss(state.round);
       }
 
       function showAttackFeedback(type, power) {
@@ -3334,6 +3515,15 @@
         battleLane.classList.toggle("danger-near", nearestMonsterX <= 0.48);
         battleLane.classList.toggle("danger-critical", nearestMonsterX <= 0.25);
         battleLane.classList.toggle("power-ready", state.defenseCharge >= 100 || state.barrageActive);
+        const activeBoss = state.monsters.find((monster) => monster.boss);
+        bossHud.hidden = !activeBoss;
+        battleLane.classList.toggle("has-boss", Boolean(activeBoss));
+        battleLane.classList.toggle("boss-raging", activeBoss?.bossPhase === 1);
+        battleLane.classList.toggle("boss-critical", activeBoss?.bossPhase === 2);
+        if (activeBoss) {
+          bossHpFill.style.width = `${Math.max(0, (activeBoss.hp / activeBoss.maxHp) * 100)}%`;
+          bossHpValue.textContent = `${Math.max(0, activeBoss.hp)}/${activeBoss.maxHp}`;
+        }
 
         const existing = new Map(
           [...monsterLayer.querySelectorAll(".monster")].map((enemy) => [enemy.dataset.monsterId, enemy])
@@ -3368,7 +3558,11 @@
             stunAura.className = "status-aura stun-aura";
             stunAura.innerHTML = "<i></i><i></i><i></i>";
 
-            enemy.append(health, body, shield, poisonAura, iceAura, stunAura);
+            const bossMark = document.createElement("em");
+            bossMark.className = "boss-mark";
+            bossMark.textContent = "BOSS";
+
+            enemy.append(health, body, shield, poisonAura, iceAura, stunAura, bossMark);
             monsterLayer.appendChild(enemy);
           }
           existing.delete(key);
@@ -3380,14 +3574,17 @@
           const knocked = monster.knockUntil > now;
           const shieldHit = monster.shieldHitUntil > now;
           const hit = monster.hitUntil > now;
-          enemy.className = `monster variant-${monster.variant} enemy-kind-${monster.kind}${frozen ? " frozen" : ""}${poisoned ? " poisoned" : ""}${burning ? " burning" : ""}${stunned ? " stunned" : ""}${knocked ? " knocked" : ""}${shieldHit ? " shield-hit" : ""}${hit ? " hit" : ""}`;
+          enemy.className = `monster variant-${monster.variant} enemy-kind-${monster.kind}${monster.boss ? ` boss boss-phase-${monster.bossPhase}` : ""}${frozen ? " frozen" : ""}${poisoned ? " poisoned" : ""}${burning ? " burning" : ""}${stunned ? " stunned" : ""}${knocked ? " knocked" : ""}${shieldHit ? " shield-hit" : ""}${hit ? " hit" : ""}`;
           enemy.style.left = `${monster.x * 100}%`;
-          enemy.setAttribute("aria-label", `${monster.name}，生命 ${Math.max(0, monster.hp)}/${monster.maxHp}${monster.shield > 0 ? `，护甲 ${monster.shield}` : ""}`);
+          enemy.style.setProperty("--lane-offset", monster.boss ? "0px" : `${(monster.id % 3) * 2}px`);
+          enemy.style.zIndex = String(monster.boss ? 30 : 10 + Math.round((1 - monster.x) * 10));
+          enemy.setAttribute("aria-label", `${monster.name}，生命 ${Math.max(0, monster.hp)}/${monster.maxHp}${monster.shield > 0 ? `，护甲 ${monster.shield}` : ""}${monster.boss ? `，阶段 ${monster.bossPhase + 1}` : ""}`);
           enemy.querySelector(".monster-health i").style.width = `${Math.max(0, (monster.hp / monster.maxHp) * 100)}%`;
           enemy.querySelector(".monster-shield").hidden = monster.shield <= 0;
           enemy.querySelector(".poison-aura").hidden = !poisoned;
           enemy.querySelector(".ice-aura").hidden = !frozen;
           enemy.querySelector(".stun-aura").hidden = !stunned;
+          enemy.querySelector(".boss-mark").hidden = !monster.boss;
         }
         for (const enemy of existing.values()) enemy.remove();
       }
@@ -3435,6 +3632,48 @@
         return monster;
       }
 
+      function spawnBoss(round) {
+        if (round !== state.round || state.ended || state.bossSpawned) return null;
+        const enemyType = ENEMY_TYPES[3];
+        const monster = {
+          id: state.nextMonsterId,
+          kind: 3,
+          name: enemyType.name,
+          variant: enemyType.variant,
+          boss: true,
+          bossPhase: 0,
+          phaseLockUntil: 0,
+          x: 0.88,
+          hp: enemyType.hp,
+          maxHp: enemyType.hp,
+          shield: enemyType.shield,
+          maxShield: enemyType.shield,
+          speed: enemyType.speed,
+          damage: enemyType.damage,
+          nextWallAttackAt: 0,
+          freezeUntil: 0,
+          poisonUntil: 0,
+          nextPoisonAt: 0,
+          burnUntil: 0,
+          stunUntil: 0,
+          knockUntil: 0,
+          shieldHitUntil: 0,
+          hitUntil: 0
+        };
+        state.nextMonsterId += 1;
+        state.bossSpawned = true;
+        state.monsters.push(monster);
+        state.spawnClock = 0;
+        renderBattle();
+        window.setTimeout(() => {
+          if (round !== state.round || state.ended || !state.monsters.some((item) => item.id === monster.id)) return;
+          showLaneCallout("首领 · 裂城巨尸", "boss-callout");
+        }, 1120);
+        setActivity("裂城巨尸进入战场，击败首领才能获胜！");
+        playTone("chain");
+        return monster;
+      }
+
       function emitParticles(x, type, count = 9, top = "62%") {
         const palettes = [
           ["#f15a50", "#ff9b8f", "#c83d39"],
@@ -3461,7 +3700,7 @@
 
       function showDeathEffect(monster, attackType) {
         const effect = document.createElement("div");
-        effect.className = `death-effect death-${attackType}`;
+        effect.className = `death-effect death-${attackType}${monster.boss ? " boss-death" : ""}`;
         effect.style.left = `${monster.x * 100}%`;
 
         if (attackType === 4) {
@@ -3506,8 +3745,8 @@
         }
 
         battleEffects.appendChild(effect);
-        emitParticles(monster.x, attackType, attackType === 5 ? 16 : 11, "61%");
-        window.setTimeout(() => effect.remove(), 1450);
+        emitParticles(monster.x, attackType, (attackType === 5 ? 16 : 11) + (monster.boss ? 12 : 0), "61%");
+        window.setTimeout(() => effect.remove(), monster.boss ? 1800 : 1450);
       }
 
       function showBattleScore(x, points) {
@@ -3519,37 +3758,71 @@
         label.addEventListener("animationend", () => label.remove(), { once: true });
       }
 
+      function updateBossPhase(monster) {
+        if (!monster.boss || monster.hp <= 0) return;
+        const ratio = monster.hp / monster.maxHp;
+        const nextPhase = ratio <= 0.33 ? 2 : ratio <= 0.66 ? 1 : 0;
+        if (nextPhase <= monster.bossPhase) return;
+        monster.bossPhase = nextPhase;
+        monster.phaseLockUntil = performance.now() + 1500;
+        monster.shieldHitUntil = performance.now() + 720;
+        emitParticles(monster.x, nextPhase === 1 ? 1 : 0, nextPhase === 1 ? 16 : 22, "60%");
+        showLaneCallout(nextPhase === 1 ? "首领狂暴" : "濒死冲锋", "boss-callout");
+        setActivity(nextPhase === 1 ? "裂城巨尸进入狂暴阶段！" : "裂城巨尸开始濒死冲锋！");
+        playTone("error");
+      }
+
       function damageMonster(id, amount, attackType, announce = false) {
         const monster = state.monsters.find((item) => item.id === id);
         if (!monster || state.ended) return false;
+        const now = performance.now();
         let healthDamage = amount;
         let absorbed = 0;
         if (monster.shield > 0) {
           absorbed = Math.min(monster.shield, healthDamage);
           monster.shield -= absorbed;
           healthDamage -= absorbed;
-          monster.shieldHitUntil = performance.now() + 340;
+          monster.shieldHitUntil = now + 340;
+        }
+        const phaseBlocked = Boolean(monster.boss && monster.phaseLockUntil > now && healthDamage > 0);
+        if (phaseBlocked) {
+          healthDamage = 0;
+          monster.shieldHitUntil = now + 360;
         }
         monster.hp -= healthDamage;
-        monster.hitUntil = performance.now() + 240;
-        if (attackType === 1) monster.burnUntil = performance.now() + 620;
+        if (monster.boss && monster.bossPhase === 0) {
+          monster.hp = Math.max(monster.hp, Math.floor(monster.maxHp * 0.66));
+        } else if (monster.boss && monster.bossPhase === 1) {
+          monster.hp = Math.max(monster.hp, Math.floor(monster.maxHp * 0.33));
+        }
+        monster.hitUntil = now + 240;
+        if (attackType === 1) monster.burnUntil = now + 620;
+        updateBossPhase(monster);
         if (monster.hp <= 0) {
           showDeathEffect(monster, attackType);
           state.monsters = state.monsters.filter((item) => item.id !== id);
           state.defeated += 1;
-          const killScore = KILL_SCORE + state.wave * 50 + monster.maxShield * 15;
+          if (monster.boss) state.bossDefeated = true;
+          const killScore = monster.boss ? 1200 : KILL_SCORE + state.wave * 50 + monster.maxShield * 15;
           state.score += killScore;
           showBattleScore(monster.x, killScore);
           updateWave();
           saveHighScore();
           renderStats();
-          setActivity(`${ATTACKS[attackType].name}击退僵尸，奖励 ${killScore} 分`);
+          setActivity(monster.boss
+            ? `裂城巨尸已被击败，奖励 ${killScore} 分！`
+            : `${ATTACKS[attackType].name}击退僵尸，奖励 ${killScore} 分`);
           playTone("chain");
           renderBattle();
+          if (monster.boss && state.score >= TARGET_SCORE && !state.busy) {
+            window.setTimeout(() => endGame(true), 420);
+          }
           return true;
         }
         if (announce) {
-          setActivity(absorbed > 0 && healthDamage === 0
+          setActivity(phaseBlocked
+            ? "首领阶段护盾抵挡了伤害"
+            : absorbed > 0 && healthDamage === 0
             ? `护甲吸收了 ${absorbed} 点伤害`
             : `${ATTACKS[attackType].name}造成 ${healthDamage} 点伤害${absorbed > 0 ? `，破甲 ${absorbed}` : ""}`);
         }
@@ -3668,7 +3941,8 @@
           if (!defeated) {
             const knocked = state.monsters.find((item) => item.id === currentTarget.id);
             if (knocked) {
-              knocked.x = Math.min(0.96, knocked.x + 0.065 + power * 0.012);
+              const knockDistance = knocked.boss ? 0.024 + power * 0.006 : 0.065 + power * 0.012;
+              knocked.x = Math.min(0.96, knocked.x + knockDistance);
               knocked.knockUntil = performance.now() + 340;
             }
           }
@@ -3679,13 +3953,13 @@
           damageMonster(currentTarget.id, 1 + power, type, true);
           const poisoned = state.monsters.find((item) => item.id === currentTarget.id);
           if (poisoned) {
-            poisoned.poisonUntil = performance.now() + 3200;
+            poisoned.poisonUntil = performance.now() + (poisoned.boss ? 2200 : 3200);
             poisoned.nextPoisonAt = performance.now() + 900;
           }
         } else if (type === 3) {
           damageMonster(currentTarget.id, 2 + power, type, true);
           const frozen = state.monsters.find((item) => item.id === currentTarget.id);
-          if (frozen) frozen.freezeUntil = performance.now() + 4200;
+          if (frozen) frozen.freezeUntil = performance.now() + (frozen.boss ? 2200 : 4200);
         } else if (type === 4) {
           const chainTargets = [...state.monsters];
           showLightningChain(chainTargets);
@@ -3700,7 +3974,7 @@
           const defeated = damageMonster(currentTarget.id, 4 + power, type, true);
           if (!defeated) {
             const stunned = state.monsters.find((item) => item.id === currentTarget.id);
-            if (stunned) stunned.stunUntil = performance.now() + 2200;
+            if (stunned) stunned.stunUntil = performance.now() + (stunned.boss ? 1000 : 2200);
           }
           state.wallHp = Math.min(100, state.wallHp + 5 + power);
         }
@@ -3729,6 +4003,7 @@
         }
 
         let wallDamage = 0;
+        let bossWallHit = false;
         for (const snapshot of [...state.monsters]) {
           let monster = state.monsters.find((item) => item.id === snapshot.id);
           if (!monster) continue;
@@ -3739,18 +4014,30 @@
             if (!monster) continue;
           }
           const speedScale = monster.stunUntil > now ? 0 : monster.freezeUntil > now ? 0.26 : 1;
-          monster.x -= monster.speed * elapsed * speedScale * resolutionScale;
-          if (monster.x <= 0.14) wallDamage += monster.damage;
+          const phaseScale = monster.boss ? (monster.bossPhase === 2 ? 1.55 : monster.bossPhase === 1 ? 1.24 : 1) : 1;
+          monster.x -= monster.speed * elapsed * speedScale * phaseScale * resolutionScale;
+          if (monster.boss && monster.x <= 0.16) {
+            monster.x = 0.16;
+            if (monster.nextWallAttackAt <= now) {
+              monster.nextWallAttackAt = now + 2600;
+              wallDamage += monster.damage;
+              bossWallHit = true;
+            }
+          } else if (monster.x <= 0.14) {
+            wallDamage += monster.damage;
+          }
         }
 
         if (wallDamage > 0) {
-          state.monsters = state.monsters.filter((monster) => monster.x > 0.14);
+          state.monsters = state.monsters.filter((monster) => monster.boss || monster.x > 0.14);
           state.wallHp = Math.max(0, state.wallHp - wallDamage);
           battleLane.classList.remove("wall-hit");
           battleLane.getBoundingClientRect();
           battleLane.classList.add("wall-hit");
           window.setTimeout(() => battleLane.classList.remove("wall-hit"), 300);
-          setActivity(`僵尸撞击城墙，损失 ${wallDamage} 点耐久`);
+          setActivity(bossWallHit
+            ? `裂城巨尸重击城墙，损失 ${wallDamage} 点耐久`
+            : `僵尸撞击城墙，损失 ${wallDamage} 点耐久`);
           playTone("error");
         }
         renderBattle();
@@ -4040,7 +4327,7 @@
         const resolved = await resolveBoard(round);
         if (!resolved || round !== state.round) return;
 
-        if (state.score >= TARGET_SCORE) {
+        if (state.score >= TARGET_SCORE && state.bossDefeated) {
           setBoardBusy(false);
           endGame(true);
           return;
@@ -4057,7 +4344,9 @@
           if (!shuffled || round !== state.round) return;
         } else {
           const options = countPossibleMoves(state.board);
-          setActivity(`棋盘稳定，还有 ${options} 种有效移动`);
+          setActivity(state.score >= TARGET_SCORE && !state.bossDefeated
+            ? "目标分数已达成，集中火力击败首领！"
+            : `棋盘稳定，还有 ${options} 种有效移动`);
         }
         setBoardBusy(false);
         scheduleHint();
@@ -4122,7 +4411,7 @@
         renderStats();
         resultTitle.textContent = won ? "城墙守住了！" : reason === "wall" ? "城墙失守" : "弹药耗尽";
         resultIcon.textContent = won ? "★" : reason === "wall" ? "▦" : "↻";
-        resultMessage.textContent = won ? `击退 ${state.defeated} 只僵尸，本局得分` : reason === "wall" ? "僵尸突破防线，本局得分" : "步数用完，本局得分";
+        resultMessage.textContent = won ? `击退首领与 ${Math.max(0, state.defeated - 1)} 只僵尸，本局得分` : reason === "wall" ? "僵尸突破防线，本局得分" : "步数用完，本局得分";
         resultScore.textContent = `${NUMBER.format(state.score)} 分`;
         resultBackdrop.classList.add("open");
         resultBackdrop.setAttribute("aria-hidden", "false");
@@ -4208,6 +4497,8 @@
         state.barrageActive = false;
         state.defeated = 0;
         state.wave = 0;
+        state.bossSpawned = false;
+        state.bossDefeated = false;
         state.feedbackId = 0;
         state.hintTimer = null;
         state.hintCells = [];
