@@ -246,11 +246,11 @@
       position: relative;
       isolation: isolate;
       width: var(--board-size);
-      height: 126px;
+      height: 150px;
       border: 3px solid var(--ink);
       border-radius: 8px;
       background:
-        linear-gradient(180deg, #a9d6d5 0 42%, #759b67 43% 100%);
+        linear-gradient(180deg, #b9dddd 0 39%, #91b995 40% 49%, #607d51 50% 100%);
       box-shadow: 4px 4px 0 var(--ink);
       overflow: hidden;
     }
@@ -261,11 +261,23 @@
       z-index: 0;
       left: 0;
       right: 0;
-      top: 38px;
-      height: 24px;
+      top: 48px;
+      height: 28px;
       background:
-        linear-gradient(135deg, transparent 0 34%, #52764d 35% 62%, transparent 63%) 0 0 / 42px 24px repeat-x;
+        linear-gradient(135deg, transparent 0 34%, #52764d 35% 62%, transparent 63%) 0 0 / 48px 28px repeat-x;
       opacity: 0.85;
+    }
+
+    .battle-lane::after {
+      content: "";
+      position: absolute;
+      z-index: 0;
+      inset: 0 0 auto;
+      height: 58px;
+      background:
+        radial-gradient(circle at 78% 34%, rgba(255, 220, 112, 0.95) 0 8px, rgba(255, 235, 166, 0.38) 9px 15px, transparent 16px),
+        linear-gradient(164deg, transparent 0 58%, rgba(68, 103, 79, 0.24) 59% 67%, transparent 68%);
+      pointer-events: none;
     }
 
     .lane-scenery {
@@ -277,7 +289,7 @@
 
     .shrub {
       position: absolute;
-      bottom: 54px;
+      bottom: 68px;
       width: 36px;
       height: 19px;
       border: 2px solid var(--ink);
@@ -292,7 +304,7 @@
     .dead-tree {
       position: absolute;
       right: 18%;
-      bottom: 54px;
+      bottom: 68px;
       width: 7px;
       height: 31px;
       border: 2px solid var(--ink);
@@ -326,7 +338,7 @@
     .road-sign {
       position: absolute;
       right: 5%;
-      bottom: 53px;
+      bottom: 67px;
       width: 5px;
       height: 28px;
       border: 2px solid var(--ink);
@@ -355,7 +367,7 @@
       left: 0;
       right: 0;
       bottom: 5px;
-      height: 60px;
+      height: 76px;
       border-top: 3px solid var(--ink);
       border-bottom: 3px solid var(--ink);
       background-color: #9b8a73;
@@ -363,8 +375,49 @@
         linear-gradient(32deg, rgba(255, 255, 255, 0.11) 12%, transparent 13% 85%, rgba(23, 32, 51, 0.14) 86%),
         linear-gradient(90deg, rgba(23, 32, 51, 0.18) 2px, transparent 2px),
         linear-gradient(rgba(23, 32, 51, 0.18) 2px, transparent 2px);
-      background-size: 54px 30px, 54px 30px, 54px 30px;
+      background-size: 66px 38px, 66px 38px, 66px 38px;
       box-shadow: inset 0 7px rgba(255, 255, 255, 0.08), 0 -6px 0 #557a49;
+    }
+
+    .danger-line {
+      position: absolute;
+      z-index: 3;
+      left: 14%;
+      bottom: 7px;
+      width: 11px;
+      height: 72px;
+      border-left: 2px dashed rgba(255, 236, 174, 0.9);
+      border-right: 2px dashed rgba(23, 32, 51, 0.25);
+      background: rgba(255, 196, 71, 0.08);
+      opacity: 0.68;
+      transition: width 220ms ease, background 220ms ease, opacity 220ms ease;
+    }
+
+    .battle-lane.danger-near .danger-line {
+      width: 46px;
+      background: repeating-linear-gradient(135deg, rgba(255, 196, 71, 0.2) 0 6px, rgba(236, 93, 72, 0.12) 6px 12px);
+      opacity: 0.92;
+    }
+
+    .battle-lane.danger-critical .danger-line {
+      width: 68px;
+      background: repeating-linear-gradient(135deg, rgba(236, 93, 72, 0.34) 0 6px, rgba(255, 196, 71, 0.16) 6px 12px);
+      animation: dangerPulse 520ms ease-in-out infinite alternate;
+    }
+
+    .spawn-rift {
+      position: absolute;
+      z-index: 3;
+      right: -10px;
+      bottom: 9px;
+      width: 28px;
+      height: 72px;
+      border: 3px solid rgba(23, 32, 51, 0.84);
+      border-radius: 50%;
+      background: radial-gradient(ellipse, #d7f4a8 0 12%, #66b86f 31%, #2d5c48 58%, rgba(23, 32, 51, 0.06) 72%);
+      box-shadow: 0 0 0 3px rgba(181, 224, 137, 0.18), 0 0 18px rgba(69, 189, 114, 0.72);
+      transform: skewX(-7deg);
+      animation: riftPulse 860ms ease-in-out infinite alternate;
     }
 
     .battle-road::before,
@@ -495,8 +548,8 @@
       z-index: 4;
       left: 7px;
       bottom: 5px;
-      width: 61px;
-      height: 77px;
+      width: 67px;
+      height: 94px;
       border: 3px solid var(--ink);
       background:
         linear-gradient(90deg, transparent 47%, rgba(23, 32, 51, 0.25) 48%, rgba(23, 32, 51, 0.25) 52%, transparent 53%),
@@ -532,6 +585,37 @@
       box-shadow: inset 4px 0 rgba(255, 255, 255, 0.12);
     }
 
+    .wall-power-core {
+      position: absolute;
+      z-index: 5;
+      top: 33px;
+      right: 7px;
+      width: 20px;
+      height: 20px;
+      border: 2px solid var(--ink);
+      border-radius: 50%;
+      background:
+        radial-gradient(circle, white 0 20%, transparent 22%),
+        conic-gradient(var(--yellow) calc(var(--charge, 0) * 1%), #5f6871 0);
+      box-shadow: inset 0 0 0 3px #303942, 0 0 4px rgba(255, 196, 71, 0.35);
+      transition: filter 180ms ease, box-shadow 180ms ease;
+    }
+
+    .battle-lane.power-ready .wall-power-core {
+      filter: brightness(1.25);
+      box-shadow: inset 0 0 0 3px #303942, 0 0 12px 3px rgba(255, 196, 71, 0.78);
+      animation: coreReady 380ms ease-in-out infinite alternate;
+    }
+
+    .battle-lane.barrage::before {
+      opacity: 1;
+      filter: brightness(1.45) saturate(1.3);
+    }
+
+    .battle-lane.barrage {
+      animation: barrageFlash 760ms ease-out;
+    }
+
     .monster-layer,
     .battle-effects {
       position: absolute;
@@ -546,9 +630,9 @@
 
     .monster {
       position: absolute;
-      bottom: 2px;
+      bottom: 7px;
       width: 48px;
-      height: 82px;
+      height: 88px;
       transform: translateX(-50%);
       transition: left 110ms linear;
     }
@@ -1395,6 +1479,19 @@
       background: #ffe06d;
     }
 
+    .battle-score {
+      position: absolute;
+      z-index: 11;
+      top: 36%;
+      color: var(--yellow);
+      font-size: 16px;
+      font-weight: 900;
+      text-shadow: 0 2px 0 var(--ink), 1px 0 0 var(--ink), -1px 0 0 var(--ink);
+      transform: translateX(-50%);
+      pointer-events: none;
+      animation: battleScoreRise 760ms ease-out forwards;
+    }
+
     .wall-hit .castle-wall {
       animation: wallHit 280ms ease;
     }
@@ -1700,6 +1797,10 @@
       line-height: 1.5;
       font-weight: 800;
     }
+
+    .stat-line .status-safe { color: var(--teal); }
+    .stat-line .status-near { color: #c9821d; }
+    .stat-line .status-critical { color: var(--coral); }
 
     .main-menu {
       position: fixed;
@@ -2215,6 +2316,33 @@
       100% { opacity: 0; transform: translateY(-50%) scaleX(1); }
     }
 
+    @keyframes riftPulse {
+      from { filter: brightness(0.86); transform: skewX(-7deg) scaleX(0.88); }
+      to { filter: brightness(1.24); transform: skewX(-7deg) scaleX(1.08); }
+    }
+
+    @keyframes dangerPulse {
+      from { opacity: 0.72; }
+      to { opacity: 1; }
+    }
+
+    @keyframes coreReady {
+      from { transform: scale(0.92); }
+      to { transform: scale(1.12); }
+    }
+
+    @keyframes barrageFlash {
+      0% { box-shadow: 4px 4px 0 var(--ink); }
+      30% { box-shadow: 4px 4px 0 var(--ink), inset 0 0 34px rgba(255, 196, 71, 0.92); }
+      100% { box-shadow: 4px 4px 0 var(--ink); }
+    }
+
+    @keyframes battleScoreRise {
+      0% { opacity: 0; transform: translate(-50%, 10px) scale(0.8); }
+      22% { opacity: 1; transform: translate(-50%, 0) scale(1.08); }
+      100% { opacity: 0; transform: translate(-50%, -28px) scale(1); }
+    }
+
     @keyframes wallHit {
       0%, 100% { transform: translateX(0); }
       30% { transform: translateX(-5px) rotate(-2deg); }
@@ -2257,7 +2385,7 @@
       }
 
       .battle-lane {
-        height: 112px;
+        height: 134px;
         box-shadow: 3px 3px 0 var(--ink);
       }
 
@@ -2266,8 +2394,8 @@
       }
 
       .castle-wall {
-        width: 52px;
-        height: 66px;
+        width: 56px;
+        height: 82px;
       }
 
       .castle-wall::after {
@@ -2275,9 +2403,9 @@
       }
 
       .monster {
-        bottom: 1px;
+        bottom: 5px;
         width: 42px;
-        height: 75px;
+        height: 82px;
       }
 
       .zombie-figure {
@@ -2288,6 +2416,27 @@
 
       .monster-health {
         width: 39px;
+      }
+
+      .battle-road {
+        height: 68px;
+      }
+
+      .shrub,
+      .dead-tree {
+        bottom: 61px;
+      }
+
+      .road-sign {
+        bottom: 60px;
+      }
+
+      .danger-line {
+        height: 64px;
+      }
+
+      .spawn-rift {
+        height: 64px;
       }
 
       .board-stage {
@@ -2358,6 +2507,15 @@
     }
 
     @media (max-width: 430px) {
+      .game-layout {
+        gap: 16px;
+        padding-bottom: 16px;
+      }
+
+      .play-column {
+        gap: 9px;
+      }
+
       .score-item {
         padding: 7px 8px 8px;
       }
@@ -2374,6 +2532,18 @@
 
       .top-actions {
         gap: 6px;
+      }
+
+      .battle-lane {
+        height: 128px;
+      }
+
+      .wall-health {
+        left: 5px;
+      }
+
+      .wave-badge {
+        right: 5px;
       }
 
       .side-panel {
@@ -2513,6 +2683,8 @@
             <i class="shrub shrub-a"></i>
             <i class="shrub shrub-b"></i>
             <i class="road-sign"></i>
+            <i class="danger-line"></i>
+            <i class="spawn-rift"></i>
           </div>
           <div class="battle-road" aria-hidden="true"></div>
           <div class="wall-health">
@@ -2521,7 +2693,7 @@
           </div>
           <div class="wave-badge"><span>第<strong id="waveValue">1</strong>波</span><i>·</i><span>击退 <strong id="defeatedValue">0</strong></span></div>
           <div class="attack-banner" id="attackBanner" aria-live="polite"></div>
-          <div class="castle-wall" aria-hidden="true"></div>
+          <div class="castle-wall" aria-hidden="true"><i class="wall-power-core" id="wallPowerCore"></i></div>
           <div class="monster-layer" id="monsterLayer" aria-live="off"></div>
           <div class="battle-effects" id="battleEffects" aria-hidden="true"></div>
         </section>
@@ -2544,6 +2716,8 @@
           <div class="stat-line"><span>最高得分</span><strong id="highScoreValue">0</strong></div>
           <div class="stat-line"><span>本局进度</span><strong id="progressValue">0%</strong></div>
           <div class="stat-line"><span>当前波次</span><strong id="sidebarWaveValue">1 / 3</strong></div>
+          <div class="stat-line"><span>防线火力</span><strong id="defenseChargeValue">0%</strong></div>
+          <div class="stat-line"><span>前线威胁</span><strong class="status-safe" id="threatValue">安全</strong></div>
         </section>
         <section class="side-section">
           <p class="eyebrow">攻击图鉴</p>
@@ -2611,6 +2785,7 @@
       const TYPE_COUNT = 6;
       const MAX_MOVES = 24;
       const TARGET_SCORE = 14000;
+      const KILL_SCORE = 150;
       const TYPE_NAMES = ["莓果糖", "橙子糖", "青柠糖", "汽水糖", "葡萄糖", "星星糖"];
       const ATTACKS = [
         { name: "莓果炮", color: "#f15a50" },
@@ -2645,9 +2820,12 @@
       const battleEffects = document.getElementById("battleEffects");
       const wallHpValue = document.getElementById("wallHpValue");
       const wallHpFill = document.getElementById("wallHpFill");
+      const wallPowerCore = document.getElementById("wallPowerCore");
       const defeatedValue = document.getElementById("defeatedValue");
       const waveValue = document.getElementById("waveValue");
       const sidebarWaveValue = document.getElementById("sidebarWaveValue");
+      const defenseChargeValue = document.getElementById("defenseChargeValue");
+      const threatValue = document.getElementById("threatValue");
       const attackBanner = document.getElementById("attackBanner");
       const scoreValue = document.getElementById("scoreValue");
       const targetValue = document.getElementById("targetValue");
@@ -2690,6 +2868,8 @@
         monsters: [],
         nextMonsterId: 1,
         wallHp: 100,
+        defenseCharge: 0,
+        barrageActive: false,
         defeated: 0,
         wave: 0,
         feedbackId: 0,
@@ -2701,6 +2881,11 @@
         soundOn: true,
         highScore: readHighScore()
       };
+
+      function setBoardBusy(busy) {
+        state.busy = busy;
+        boardElement.setAttribute("aria-busy", String(busy));
+      }
 
       function readHighScore() {
         try {
@@ -2943,12 +3128,27 @@
 
       function renderBattle() {
         const now = performance.now();
+        const nearestMonsterX = state.monsters.length > 0
+          ? Math.min(...state.monsters.map((monster) => monster.x))
+          : 1;
+        const threat = nearestMonsterX <= 0.25
+          ? { label: "危险", className: "status-critical" }
+          : nearestMonsterX <= 0.48
+            ? { label: "接近", className: "status-near" }
+            : { label: "安全", className: "status-safe" };
         wallHpValue.textContent = String(Math.max(0, Math.ceil(state.wallHp)));
         wallHpFill.style.width = `${Math.max(0, state.wallHp)}%`;
+        wallPowerCore.style.setProperty("--charge", String(state.defenseCharge));
+        defenseChargeValue.textContent = `${Math.round(state.defenseCharge)}%`;
+        threatValue.textContent = threat.label;
+        threatValue.className = threat.className;
         defeatedValue.textContent = String(state.defeated);
         waveValue.textContent = String(state.wave + 1);
         sidebarWaveValue.textContent = `${state.wave + 1} / ${WAVES.length}`;
         battleLane.classList.toggle("wall-danger", state.wallHp <= 35);
+        battleLane.classList.toggle("danger-near", nearestMonsterX <= 0.48);
+        battleLane.classList.toggle("danger-critical", nearestMonsterX <= 0.25);
+        battleLane.classList.toggle("power-ready", state.defenseCharge >= 100 || state.barrageActive);
 
         const existing = new Map(
           [...monsterLayer.querySelectorAll(".monster")].map((enemy) => [enemy.dataset.monsterId, enemy])
@@ -3125,6 +3325,15 @@
         window.setTimeout(() => effect.remove(), 1450);
       }
 
+      function showBattleScore(x, points) {
+        const label = document.createElement("strong");
+        label.className = "battle-score";
+        label.style.left = `${x * 100}%`;
+        label.textContent = `+${NUMBER.format(points)}`;
+        battleEffects.appendChild(label);
+        label.addEventListener("animationend", () => label.remove(), { once: true });
+      }
+
       function damageMonster(id, amount, attackType, announce = false) {
         const monster = state.monsters.find((item) => item.id === id);
         if (!monster || state.ended) return false;
@@ -3143,7 +3352,13 @@
           showDeathEffect(monster, attackType);
           state.monsters = state.monsters.filter((item) => item.id !== id);
           state.defeated += 1;
-          setActivity(`${ATTACKS[attackType].name}击退了僵尸！`);
+          const killScore = KILL_SCORE + state.wave * 50 + monster.maxShield * 15;
+          state.score += killScore;
+          showBattleScore(monster.x, killScore);
+          updateWave();
+          saveHighScore();
+          renderStats();
+          setActivity(`${ATTACKS[attackType].name}击退僵尸，奖励 ${killScore} 分`);
           playTone("chain");
           renderBattle();
           return true;
@@ -3192,6 +3407,35 @@
           link.style.animationDelay = `${index * 80}ms`;
           battleEffects.appendChild(link);
           link.addEventListener("animationend", () => link.remove(), { once: true });
+        }
+      }
+
+      function gainDefenseCharge(matches, chain, groupCount) {
+        const gain = Math.min(30, matches.size * 2 + groupCount * 3 + Math.max(0, chain - 1) * 6);
+        state.defenseCharge = Math.min(100, state.defenseCharge + gain);
+        renderBattle();
+        return state.defenseCharge >= 100;
+      }
+
+      async function triggerDefenseBarrage(round) {
+        if (round !== state.round || state.ended || state.barrageActive || state.defenseCharge < 100) return;
+        state.barrageActive = true;
+        state.defenseCharge = 0;
+        battleLane.classList.remove("barrage");
+        battleLane.getBoundingClientRect();
+        battleLane.classList.add("barrage");
+        renderBattle();
+        setActivity("防线火力全开，六重齐射！");
+        playTone("chain");
+        const salvoMatches = new Set(["0-0", "0-1", "0-2"]);
+        try {
+          await Promise.all(ATTACKS.map((_, type) => (
+            performAttack(type, salvoMatches, 1, round, type * 90)
+          )));
+        } finally {
+          state.barrageActive = false;
+          battleLane.classList.remove("barrage");
+          renderBattle();
         }
       }
 
@@ -3498,9 +3742,14 @@
         const attacks = matchGroups.map((group, index) => (
           performAttack(dominantMatchType(group), group, chain, round, index * 120)
         ));
+        const barrageReady = gainDefenseCharge(matches, chain, matchGroups.length);
         playTone(chain > 1 ? "chain" : "clear");
         await Promise.all([wait(270), ...attacks]);
         if (round !== state.round) return false;
+        if (barrageReady) {
+          await triggerDefenseBarrage(round);
+          if (round !== state.round) return false;
+        }
         for (const key of matches) {
           const { row, col } = parseKey(key);
           state.board[row][col] = null;
@@ -3551,7 +3800,7 @@
         if (state.busy || state.ended || state.paused || !isAdjacent(a, b)) return;
         clearHint();
         const round = state.round;
-        state.busy = true;
+        setBoardBusy(true);
         state.selected = null;
         await animateSwap(a, b);
         if (round !== state.round) return;
@@ -3569,7 +3818,7 @@
           swap(state.board, a, b);
           renderBoard();
           boardElement.classList.remove("invalid");
-          state.busy = false;
+          setBoardBusy(false);
           scheduleHint();
           return;
         }
@@ -3580,13 +3829,13 @@
         if (!resolved || round !== state.round) return;
 
         if (state.score >= TARGET_SCORE) {
-          state.busy = false;
+          setBoardBusy(false);
           endGame(true);
           return;
         }
 
         if (state.moves <= 0) {
-          state.busy = false;
+          setBoardBusy(false);
           endGame(false);
           return;
         }
@@ -3598,7 +3847,7 @@
           const options = countPossibleMoves(state.board);
           setActivity(`棋盘稳定，还有 ${options} 种有效移动`);
         }
-        state.busy = false;
+        setBoardBusy(false);
         scheduleHint();
       }
 
@@ -3694,7 +3943,7 @@
         state.round += 1;
         state.inMenu = true;
         state.ended = true;
-        state.busy = false;
+        setBoardBusy(false);
         state.paused = false;
         state.autoPaused = false;
         state.monsters = [];
@@ -3735,13 +3984,15 @@
         state.score = 0;
         state.moves = MAX_MOVES;
         state.combo = 1;
-        state.busy = false;
+        setBoardBusy(false);
         state.ended = false;
         state.paused = false;
         state.autoPaused = false;
         state.monsters = [];
         state.nextMonsterId = 1;
         state.wallHp = 100;
+        state.defenseCharge = 0;
+        state.barrageActive = false;
         state.defeated = 0;
         state.wave = 0;
         state.feedbackId = 0;
