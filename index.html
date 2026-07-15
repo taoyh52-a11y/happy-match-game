@@ -1665,6 +1665,94 @@
       clip-path: polygon(50% 0, 62% 32%, 98% 35%, 70% 57%, 79% 94%, 50% 73%, 20% 94%, 30% 57%, 2% 35%, 38% 32%);
     }
 
+    .special-candy {
+      filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.9)) drop-shadow(0 4px 0 rgba(10, 19, 33, 0.3));
+    }
+
+    .special-candy::before {
+      content: "";
+      position: absolute;
+      z-index: 2;
+      pointer-events: none;
+    }
+
+    .special-row::before {
+      left: -12%;
+      right: -12%;
+      top: 50%;
+      height: 20%;
+      border: 2px solid var(--ink);
+      background: white;
+      box-shadow: 0 0 6px var(--yellow);
+      transform: translateY(-50%) rotate(-7deg);
+    }
+
+    .special-col::before {
+      top: -12%;
+      bottom: -12%;
+      left: 50%;
+      width: 20%;
+      border: 2px solid var(--ink);
+      background: white;
+      box-shadow: 0 0 6px var(--yellow);
+      transform: translateX(-50%) rotate(7deg);
+    }
+
+    .special-bomb::before {
+      left: 50%;
+      top: 50%;
+      width: 42%;
+      aspect-ratio: 1;
+      border: 2px solid white;
+      border-radius: 50%;
+      background: var(--ink);
+      box-shadow: 0 0 0 2px var(--yellow), 0 0 9px white;
+      transform: translate(-50%, -50%);
+    }
+
+    .special-rainbow {
+      width: 88%;
+      height: 88%;
+      border-radius: 50%;
+      clip-path: none;
+      background: conic-gradient(#f15a50, #ff963c, #ffd44f, #45bd72, #42bfe8, #9b68dc, #f15a50);
+      transform: none;
+      animation: rainbowCore 1.2s linear infinite;
+    }
+
+    .special-rainbow::before {
+      inset: 22%;
+      border: 2px solid var(--ink);
+      border-radius: 50%;
+      background: white;
+      box-shadow: 0 0 8px white;
+    }
+
+    .tile.special-forming .piece {
+      animation: specialForm 460ms cubic-bezier(.16, .82, .25, 1.2) both;
+    }
+
+    .tile.special-triggered::before {
+      content: "";
+      position: absolute;
+      z-index: 4;
+      inset: -6px;
+      border: 3px solid white;
+      border-radius: 7px;
+      box-shadow: 0 0 0 3px var(--yellow), 0 0 18px white;
+      pointer-events: none;
+      animation: specialTrigger 420ms ease-out forwards;
+    }
+
+    .battle-lane.resolving .monster {
+      transition-duration: 180ms;
+    }
+
+    .battle-lane.resolving .spawn-rift {
+      animation-duration: 1.4s;
+      filter: saturate(0.72);
+    }
+
     .tile.clearing .piece {
       animation: clearCandy 260ms ease-in forwards;
     }
@@ -2343,6 +2431,21 @@
       100% { opacity: 0; transform: translate(-50%, -28px) scale(1); }
     }
 
+    @keyframes rainbowCore {
+      to { filter: hue-rotate(360deg) drop-shadow(0 0 6px white); }
+    }
+
+    @keyframes specialForm {
+      0% { transform: scale(0.35) rotate(-18deg); filter: brightness(2.2); }
+      64% { transform: scale(1.18) rotate(5deg); filter: brightness(1.45); }
+      100% { transform: scale(1); filter: brightness(1); }
+    }
+
+    @keyframes specialTrigger {
+      from { opacity: 1; transform: scale(0.55); }
+      to { opacity: 0; transform: scale(1.45); }
+    }
+
     @keyframes wallHit {
       0%, 100% { transform: translateX(0); }
       30% { transform: translateX(-5px) rotate(-2deg); }
@@ -2787,6 +2890,7 @@
       const TARGET_SCORE = 14000;
       const KILL_SCORE = 150;
       const TYPE_NAMES = ["莓果糖", "橙子糖", "青柠糖", "汽水糖", "葡萄糖", "星星糖"];
+      const SPECIAL_NAMES = { row: "横向炮", col: "纵向炮", bomb: "范围炸弹", rainbow: "彩虹核心" };
       const ATTACKS = [
         { name: "莓果炮", color: "#f15a50" },
         { name: "烈焰弹", color: "#ff963c" },
@@ -2855,6 +2959,7 @@
 
       const state = {
         board: [],
+        specials: [],
         selected: null,
         score: 0,
         moves: MAX_MOVES,
@@ -2885,6 +2990,7 @@
       function setBoardBusy(busy) {
         state.busy = busy;
         boardElement.setAttribute("aria-busy", String(busy));
+        battleLane.classList.toggle("resolving", busy);
       }
 
       function readHighScore() {
@@ -2993,6 +3099,85 @@
           for (const key of group) matches.add(key);
         }
         return matches;
+      }
+
+      function groupOrientation(group) {
+        const positions = [...group].map(parseKey);
+        return positions.every((position) => position.row === positions[0].row) ? "row" : "col";
+      }
+
+      function findSpecialCreations(groups) {
+        const creations = new Map();
+        const bombGroups = new Set();
+        for (let first = 0; first < groups.length; first += 1) {
+          for (let second = first + 1; second < groups.length; second += 1) {
+            if (groupOrientation(groups[first]) === groupOrientation(groups[second])) continue;
+            const intersection = [...groups[first]].find((key) => groups[second].has(key));
+            if (!intersection) continue;
+            const { row, col } = parseKey(intersection);
+            if (!state.specials[row]?.[col]) creations.set(intersection, "bomb");
+            bombGroups.add(first);
+            bombGroups.add(second);
+          }
+        }
+
+        groups.forEach((group, index) => {
+          if (bombGroups.has(index) || group.size < 4) return;
+          const kind = group.size >= 5 ? "rainbow" : groupOrientation(group);
+          const candidates = [...group]
+            .map((key) => ({ key, ...parseKey(key) }))
+            .sort((a, b) => a.row - b.row || a.col - b.col);
+          const available = candidates.filter(({ key, row, col }) => !creations.has(key) && !state.specials[row]?.[col]);
+          const pool = available.length > 0 ? available : candidates;
+          const chosen = pool[Math.floor(pool.length / 2)];
+          if (chosen && !creations.has(chosen.key)) creations.set(chosen.key, kind);
+        });
+        return creations;
+      }
+
+      function specialTargets(kind, position, candyType) {
+        const targets = [];
+        if (kind === "row") {
+          for (let col = 0; col < SIZE; col += 1) targets.push(positionKey(position.row, col));
+        } else if (kind === "col") {
+          for (let row = 0; row < SIZE; row += 1) targets.push(positionKey(row, position.col));
+        } else if (kind === "bomb") {
+          for (let row = Math.max(0, position.row - 1); row <= Math.min(SIZE - 1, position.row + 1); row += 1) {
+            for (let col = Math.max(0, position.col - 1); col <= Math.min(SIZE - 1, position.col + 1); col += 1) {
+              targets.push(positionKey(row, col));
+            }
+          }
+        } else {
+          for (let row = 0; row < SIZE; row += 1) {
+            for (let col = 0; col < SIZE; col += 1) {
+              if (state.board[row][col] === candyType) targets.push(positionKey(row, col));
+            }
+          }
+        }
+        return targets;
+      }
+
+      function expandSpecialMatches(baseMatches) {
+        const expanded = new Set(baseMatches);
+        const queue = [...expanded];
+        const activated = [];
+        const activatedKeys = new Set();
+        while (queue.length > 0) {
+          const key = queue.shift();
+          if (activatedKeys.has(key)) continue;
+          const position = parseKey(key);
+          const kind = state.specials[position.row]?.[position.col];
+          if (!kind) continue;
+          activatedKeys.add(key);
+          activated.push({ key, kind, type: state.board[position.row][position.col] });
+          for (const targetKey of specialTargets(kind, position, state.board[position.row][position.col])) {
+            const target = parseKey(targetKey);
+            if (state.board[target.row][target.col] === null || expanded.has(targetKey)) continue;
+            expanded.add(targetKey);
+            queue.push(targetKey);
+          }
+        }
+        return { matches: expanded, activated };
       }
 
       function hasPossibleMove(board) {
@@ -3535,7 +3720,8 @@
         }
         const elapsed = Math.min(0.25, Math.max(0, (now - state.battleLastTime) / 1000));
         state.battleLastTime = now;
-        state.spawnClock += elapsed;
+        const resolutionScale = state.busy ? 0.35 : 1;
+        state.spawnClock += elapsed * (state.busy ? 0.5 : 1);
         const spawnInterval = Math.max(3.2, WAVES[state.wave].spawnInterval - state.defeated * 0.015);
         if (state.spawnClock >= spawnInterval && state.monsters.length < 4) {
           state.spawnClock = 0;
@@ -3553,7 +3739,7 @@
             if (!monster) continue;
           }
           const speedScale = monster.stunUntil > now ? 0 : monster.freezeUntil > now ? 0.26 : 1;
-          monster.x -= monster.speed * elapsed * speedScale;
+          monster.x -= monster.speed * elapsed * speedScale * resolutionScale;
           if (monster.x <= 0.14) wallDamage += monster.damage;
         }
 
@@ -3615,14 +3801,16 @@
         for (let row = 0; row < SIZE; row += 1) {
           for (let col = 0; col < SIZE; col += 1) {
             const type = state.board[row][col];
+            const special = state.specials[row]?.[col] || null;
             const tile = document.createElement("button");
             tile.type = "button";
             tile.className = "tile";
             tile.dataset.row = row;
             tile.dataset.col = col;
             tile.setAttribute("role", "gridcell");
-            tile.setAttribute("aria-label", `第${row + 1}行第${col + 1}列，${TYPE_NAMES[type]}`);
+            tile.setAttribute("aria-label", `第${row + 1}行第${col + 1}列，${TYPE_NAMES[type]}${special ? `，${SPECIAL_NAMES[special]}` : ""}`);
             tile.style.setProperty("--cell-index", String(row * SIZE + col));
+            if (special) tile.classList.add("special-tile");
 
             if (state.selected && state.selected.row === row && state.selected.col === col) {
               tile.classList.add("selected");
@@ -3634,7 +3822,7 @@
             const piece = document.createElement("span");
             piece.className = "piece";
             const candy = document.createElement("span");
-            candy.className = `candy type-${type}`;
+            candy.className = `candy type-${type}${special ? ` special-candy special-${special}` : ""}`;
             piece.appendChild(candy);
             tile.appendChild(piece);
             fragment.appendChild(tile);
@@ -3728,31 +3916,49 @@
 
       async function clearMatches(matches, chain, round) {
         const matchGroups = findMatchGroups(state.board);
-        const points = matches.size * 100 * chain;
+        const specialCreations = findSpecialCreations(matchGroups);
+        const expanded = expandSpecialMatches(matches);
+        const scoringMatches = expanded.matches;
+        const clearedMatches = new Set(scoringMatches);
+        for (const key of specialCreations.keys()) clearedMatches.delete(key);
+        const points = scoringMatches.size * 100 * chain + specialCreations.size * 200;
         state.score += points;
         state.combo = chain;
         updateWave();
         saveHighScore();
         renderStats();
-        showFloatingScore(matches, points);
-        for (const key of matches) {
+        showFloatingScore(scoringMatches, points);
+        for (const key of clearedMatches) {
           const position = parseKey(key);
           getTile(position)?.classList.add("clearing");
         }
-        const attacks = matchGroups.map((group, index) => (
+        for (const { key } of expanded.activated) getTile(parseKey(key))?.classList.add("special-triggered");
+        for (const key of specialCreations.keys()) getTile(parseKey(key))?.classList.add("special-forming");
+
+        const groupAttacks = matchGroups.map((group, index) => (
           performAttack(dominantMatchType(group), group, chain, round, index * 120)
         ));
-        const barrageReady = gainDefenseCharge(matches, chain, matchGroups.length);
+        const specialAttacks = expanded.activated.map((special, index) => {
+          const size = special.kind === "rainbow" ? 6 : special.kind === "bomb" ? 5 : 4;
+          const attackMatches = new Set(Array.from({ length: size }, (_, keyIndex) => `special-${index}-${keyIndex}`));
+          return performAttack(special.type, attackMatches, chain + 1, round, matchGroups.length * 120 + index * 100);
+        });
+        const barrageReady = gainDefenseCharge(scoringMatches, chain, matchGroups.length + expanded.activated.length);
         playTone(chain > 1 ? "chain" : "clear");
-        await Promise.all([wait(270), ...attacks]);
+        await Promise.all([wait(320), ...groupAttacks, ...specialAttacks]);
         if (round !== state.round) return false;
         if (barrageReady) {
           await triggerDefenseBarrage(round);
           if (round !== state.round) return false;
         }
-        for (const key of matches) {
+        for (const key of clearedMatches) {
           const { row, col } = parseKey(key);
           state.board[row][col] = null;
+          state.specials[row][col] = null;
+        }
+        for (const [key, kind] of specialCreations) {
+          const { row, col } = parseKey(key);
+          state.specials[row][col] = kind;
         }
         return true;
       }
@@ -3762,15 +3968,19 @@
         for (let col = 0; col < SIZE; col += 1) {
           const remaining = [];
           for (let row = SIZE - 1; row >= 0; row -= 1) {
-            if (state.board[row][col] !== null) remaining.push(state.board[row][col]);
+            if (state.board[row][col] !== null) {
+              remaining.push({ type: state.board[row][col], special: state.specials[row][col] });
+            }
           }
           let index = 0;
           for (let row = SIZE - 1; row >= 0; row -= 1) {
             if (index < remaining.length) {
-              state.board[row][col] = remaining[index];
+              state.board[row][col] = remaining[index].type;
+              state.specials[row][col] = remaining[index].special;
               index += 1;
             } else {
               state.board[row][col] = randomType();
+              state.specials[row][col] = null;
               fresh.add(positionKey(row, col));
             }
           }
@@ -3805,6 +4015,7 @@
         await animateSwap(a, b);
         if (round !== state.round) return;
         swap(state.board, a, b);
+        swap(state.specials, a, b);
         renderBoard();
 
         if (findMatches(state.board).size === 0) {
@@ -3816,6 +4027,7 @@
           await animateSwap(a, b);
           if (round !== state.round) return;
           swap(state.board, a, b);
+          swap(state.specials, a, b);
           renderBoard();
           boardElement.classList.remove("invalid");
           setBoardBusy(false);
@@ -3980,6 +4192,7 @@
         attackBanner.classList.remove("show");
         for (const icon of document.querySelectorAll("[data-attack-type]")) icon.classList.remove("active");
         state.board = createPlayableBoard();
+        state.specials = Array.from({ length: SIZE }, () => Array(SIZE).fill(null));
         state.selected = null;
         state.score = 0;
         state.moves = MAX_MOVES;
